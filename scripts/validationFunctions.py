@@ -3,8 +3,10 @@ from bigrest.bigip import BIGIP
 from bigrest.utils.utils import rest_format
 from bigrest.utils.utils import token
 
+
 import urllib.parse
 import helper
+import json
 
 
 
@@ -76,3 +78,77 @@ def getLicenseInfo(_device):
         }
         license_info["time_limited_modules"].append(module)
     return license_info
+
+
+
+
+
+def getVirtualServerInfo(_device, detailed):
+    # Return information about virutal server availability.
+
+    # If detailed == true, then per virtual server information will be provided, else just
+    # a high level summary.
+
+    #TODO: Perhaps adding filter options...
+    # and parameter validation??
+
+
+
+
+    virtualServerInfo = {
+        "summary" : {
+            "total":0,
+            "status_unknown":0,
+            "status_available":0,
+            "status_offline":0,
+            "status_other":0,
+            "state_enabled":0,
+            "state_disabled":0
+        },
+        "detailed":[]
+    }
+
+    rest_details = _device.show(f"/mgmt/tm/ltm/virtual")
+
+    # Loop through virtual servers to create summary of availability/status
+    for i in rest_details:
+        rest_dict = i.asdict() #Convert to a dict
+        virtualServerInfo["summary"]["total"]+=1
+        availability_status = rest_dict["status.availabilityState"]["description"]
+
+        if ( availability_status == "unknown") :
+            virtualServerInfo["summary"]["status_unknown"] += 1
+        elif (availability_status == "available"):
+            virtualServerInfo["summary"]["status_available"] += 1
+        elif (availability_status == "offline"):
+            virtualServerInfo["summary"]["status_offline"] += 1
+        else:
+            virtualServerInfo["summary"]["status_other"] += 1
+
+        
+        enabled_state = rest_dict["status.enabledState"]["description"]
+        if( enabled_state == "enabled" ):
+            virtualServerInfo["summary"]["state_enabled"] += 1
+        elif ( enabled_state == "disabled" ):
+            virtualServerInfo["summary"]["state_disabled"] += 1
+
+        # If a detailed (per-vs) response is required, add that.
+        # Currently only planning on returning status and state (i.e. available but disabled)
+        if( detailed is True ):
+            print(json.dumps(rest_dict))
+            virtualServer = {
+                "name":rest_dict["tmName"]["description"],
+                "state":rest_dict["status.enabledState"]["description"],
+                "availability":rest_dict["status.availabilityState"]["description"]
+            }
+
+            virtualServerInfo["detailed"].append(virtualServer)
+            
+
+    
+        
+    return virtualServerInfo
+
+        
+
+
