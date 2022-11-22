@@ -1,0 +1,19 @@
+- name: Get status
+  hosts: all
+  connection: local
+  gather_facts: false
+
+  tasks:
+    - name: Collect information of all virtual servers
+      bigip_device_info:
+        gather_subset:
+          - virtual-servers
+        provider: "{{ provider }}"
+      register: facts_result
+
+    - name: Convert Python script output (AnsibleUnsafeText) into Ansible dict
+      set_fact:
+        virtual_servers: "{{ facts_result.virtual_servers }}"
+
+    - debug:
+        var: virtual_servers
