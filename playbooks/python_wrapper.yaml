@@ -1,8 +1,8 @@
 # To try this playbook, run
 #
-#   ansible-playbook -i inventory/inventory.ini python_wrapper.yaml
+#   ansible-playbook -i inventory/inventory.ini playbooks/python_wrapper.yaml
 #
-# You should see a file 'output.json.tmp' in the same directory as this playbook, with the following contents
+# You should see a file '<project_root>/output/test.json.tmp' with the following contents
 #   {
 #     "input_args": [
 #       "bigip.local",
@@ -13,11 +13,11 @@
 #
 - name: Python wrapper
   hosts: all
-  gather_facts: no
+  gather_facts: false
 
   tasks:
     - name: Execute Python script locally on machine where Ansible is run
-      command: "python3 {{ playbook_dir }}/scripts/ansible-wrapper-test.py bigip.local username password"
+      command: "python3 {{ playbook_dir }}/../scripts/ansible-wrapper-test.py bigip.local username password"
       delegate_to: localhost
       run_once: true
       register: script_output
@@ -28,6 +28,6 @@
 
     - name: Write Python script output to a file locally
       copy:
-        dest: "{{ playbook_dir }}/output.json.tmp"
+        dest: "{{ playbook_dir }}/../.output/test.json.tmp"
         content: "{{ json_output | to_nice_json(indent=2) }}"
       delegate_to: localhost
