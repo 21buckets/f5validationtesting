@@ -19,12 +19,8 @@
         check_output_file: "{{ (playbook_dir + '/../.output/compare-output-' + timestamp + '.json') | realpath }}"
 
     - include_tasks: "{{ playbook_dir }}/../tasks/get_device_info.yaml"
-
-    - name: Store device info to file
-      copy:
-        dest: "{{ post_upgrade_device_info_file }}"
-        content: "{{ facts_result | to_nice_json(indent=2) }}"
-      delegate_to: localhost
+      vars:
+        device_info_file: "{{ post_upgrade_device_info_file }}"
 
     - name: Compare device info pre and post upgrade
       command: "python3 {{ playbook_dir }}/../scripts/compare-device-info.py {{ pre_upgrade_device_info_file }} {{ post_upgrade_device_info_file }}"

@@ -5,3 +5,9 @@
       - ltm-pools
     provider: "{{ provider }}"
   register: facts_result
+
+- name: Store device info to file
+  copy:
+    dest: "{{ device_info_file }}"
+    content: "{{ facts_result | to_nice_json(indent=2) }}"
+  delegate_to: localhost
