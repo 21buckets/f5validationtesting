@@ -1,0 +1,7 @@
+- name: Collect device info
+  bigip_device_info:
+    gather_subset:
+      - virtual-servers
+      - ltm-pools
+    provider: "{{ provider }}"
+  register: facts_result

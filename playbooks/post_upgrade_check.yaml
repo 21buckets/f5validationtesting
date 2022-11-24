@@ -1,0 +1,42 @@
+- name: Get status
+  hosts: all
+  connection: local
+  gather_facts: false
+
+  tasks:
+    - set_fact:
+        timestamp: "{{ lookup('pipe', 'date +%Y%m%d-%H%M%S') }}"
+
+    - name: Get a list of pre-upgrade snapshots. To be used to find the latest copy.
+      find:
+        paths: "{{ playbook_dir }}/../.output"
+        patterns: "pre-upgrade-device-info-*.json"
+      register: find_output
+
+    - set_fact:
+        pre_upgrade_device_info_file: "{{ find_output.files | map(attribute='path') | sort | last }}"
+        post_upgrade_device_info_file: "{{ playbook_dir }}/../.output/post-upgrade-device-info-{{ timestamp }}.json"
+        check_output_file: "{{ playbook_dir }}/../.output/compare-output-{{ timestamp }}.json"
+
+    - include_tasks: "{{ playbook_dir }}/../tasks/get_device_info.yaml"
+
+    - name: Store device info to file
+      copy:
+        dest: "{{ post_upgrade_device_info_file }}"
+        content: "{{ facts_result | to_nice_json(indent=2) }}"
+      delegate_to: localhost
+
+    - name: Compare device info pre and post upgrade
+      command: "python3 {{ playbook_dir }}/../scripts/compare-device-info.py {{ pre_upgrade_device_info_file }} {{ post_upgrade_device_info_file }}"
+      delegate_to: localhost
+      register: script_output
+
+    - name: Convert Python script output (AnsibleUnsafeText) into Ansible dict
+      set_fact:
+        json_output: "{{ script_output.stdout_lines | join('\n') }}"
+
+    - name: Write Python script output to a file locally
+      copy:
+        dest: "{{ check_output_file }}"
+        content: "{{ json_output | to_nice_json(indent=2) }}"
+      delegate_to: localhost
