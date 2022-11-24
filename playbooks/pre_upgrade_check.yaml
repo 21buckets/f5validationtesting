@@ -4,10 +4,13 @@
   gather_facts: false
 
   tasks:
+    - set_fact:
+        timestamp: "{{ lookup('pipe', 'date +%Y%m%d-%H%M%S') }}"
+
     - include_tasks: "{{ playbook_dir }}/../tasks/get_device_info.yaml"
 
     - name: Store device info to file
       copy:
-        dest: "{{ playbook_dir }}/../.output/pre-upgrade-device-info-{{ lookup('pipe', 'date +%Y%m%d-%H%M%S') }}.json"
+        dest: "{{ (playbook_dir + '/../.output/pre-upgrade-device-info-' + timestamp + '.json') | realpath }}"
         content: "{{ facts_result | to_nice_json(indent=2) }}"
       delegate_to: localhost

@@ -15,8 +15,8 @@
 
     - set_fact:
         pre_upgrade_device_info_file: "{{ find_output.files | map(attribute='path') | sort | last }}"
-        post_upgrade_device_info_file: "{{ playbook_dir }}/../.output/post-upgrade-device-info-{{ timestamp }}.json"
-        check_output_file: "{{ playbook_dir }}/../.output/compare-output-{{ timestamp }}.json"
+        post_upgrade_device_info_file: "{{ (playbook_dir + '/../.output/post-upgrade-device-info-' + timestamp + '.json') | realpath }}"
+        check_output_file: "{{ (playbook_dir + '/../.output/compare-output-' + timestamp + '.json') | realpath }}"
 
     - include_tasks: "{{ playbook_dir }}/../tasks/get_device_info.yaml"
 
