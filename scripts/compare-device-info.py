@@ -1,13 +1,20 @@
 import sys
 import json
 
-with open(sys.argv[1]) as f:
+pre_upgrade_device_info_file = sys.argv[1]
+with open(pre_upgrade_device_info_file) as f:
   pre_upgrade_device_info = json.load(f)
 
-with open(sys.argv[2]) as f:
+post_upgrade_device_info_file = sys.argv[2]
+with open(post_upgrade_device_info_file) as f:
   post_upgrade_device_info = json.load(f)
 
-results = {}
+results = {
+  "_summary": {
+    "pre_upgrade_device_info_file": pre_upgrade_device_info_file,
+    "post_upgrade_device_info_file": post_upgrade_device_info_file
+  }
+}
 
 # Compare virtual server
 subset = "virtual_servers"
