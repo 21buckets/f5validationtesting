@@ -16,5 +16,5 @@
 
 | Playbook | Description |
 | --- | --- |
-| [pre_upgrade_check.yaml](playbooks/pre_upgrade_check.yaml) | Gets device info on Virtual Servers and LTM Pools from BIG-IP and stores snapshot in [.output](.output) directory with filename format `pre-upgrade-dev-info-<timestamp>.json` |
-| [post_upgrade_check.yaml](playbooks/post_upgrade_check.yaml) | Gets device info on Virtual Servers and LTM Pools from BIG-IP and stores snapshot in [.output](.output) directory with filename format `post-upgrade-dev-info-<timestamp>.json`, then compares it against the last pre-upgrade snapshot (determined by latest timestamp).<br><br>The results of the comparison will be stored in [.output](.output) directory with filename format `compare-output-<timestamp>.json` |
+| [pre_upgrade_check.yaml](playbooks/pre_upgrade_check.yaml) | Gets device info on Virtual Servers and LTM Pools from BIG-IP and stores snapshot in `.output` directory with filename format `pre-upgrade-dev-info-<timestamp>.json` |
+| [post_upgrade_check.yaml](playbooks/post_upgrade_check.yaml) | Gets device info on Virtual Servers and LTM Pools from BIG-IP and stores snapshot in `.output` directory with filename format `post-upgrade-dev-info-<timestamp>.json`, then compares it against the last pre-upgrade snapshot (determined by latest timestamp).<br><br>The results of the comparison will be stored in `.output` directory with filename format `compare-output-<timestamp>.json` |
